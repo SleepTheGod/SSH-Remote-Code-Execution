@@ -19,3 +19,10 @@ Check the return values of the "open" and "write" functions, and handle errors a
 Free the memory allocated for the "buffer" and "ssh" pointers.
 Replace the "system" function with a safer alternative, such as "execvp", to avoid potential security vulnerabilities.
 It is recommended that these changes be made to the program to ensure its stability and security.
+
+Added (with ChatGPT) ssh.c
+compile it on ubuntu with
+sudo apt-get install libbsd-dev
+gcc ssh.c -o ssh -lbsd
+
+There is a bad indexing in the code ssh.c (plz help !) no work yet :(
