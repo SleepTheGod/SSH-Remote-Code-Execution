@@ -31,6 +31,149 @@ To improve the program's security and reliability, the following changes are rec
 Implementing these fixes will enhance the program’s stability and reduce potential security vulnerabilities.
 
 ---
+```bash
+
+root@29bcb37807cf:/poc# apt-get install -y --allow-unauthenticated libc6-dev libgcc1 libstdc++6
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+libgcc1 is already the newest version.
+libgcc1 set to manually installed.
+libstdc++6 is already the newest version.
+libstdc++6 set to manually installed.
+libc6-dev is already the newest version.
+0 upgraded, 0 newly installed, 0 to remove and 15 not upgraded.
+root@29bcb37807cf:/poc# apt-get install -y --allow-unauthenticated gcc g++ make dpkg-dev
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+dpkg-dev is already the newest version.
+g++ is already the newest version.
+gcc is already the newest version.
+make is already the newest version.
+0 upgraded, 0 newly installed, 0 to remove and 15 not upgraded.
+root@29bcb37807cf:/poc# apt-get install -y --allow-unauthenticated build-essential
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+build-essential is already the newest version.
+0 upgraded, 0 newly installed, 0 to remove and 15 not upgraded.
+root@29bcb37807cf:/poc# apt-get update -o Acquire::Check-Valid-Until=false && \
+> apt-get install -y --allow-unauthenticated libc6-dev libgcc1 libstdc++6 gcc g++ make dpkg-dev build-essential
+Get:1 http://archive.debian.org wheezy Release.gpg [2373 B]
+Get:2 http://archive.debian.org wheezy/updates Release.gpg [1601 B]
+Hit http://archive.debian.org wheezy Release
+Hit http://archive.debian.org wheezy/updates Release
+Ign http://archive.debian.org wheezy Release
+Hit http://archive.debian.org wheezy/main i386 Packages
+Ign http://archive.debian.org wheezy/updates Release
+Hit http://archive.debian.org wheezy/contrib i386 Packages
+Hit http://archive.debian.org wheezy/non-free i386 Packages
+Hit http://archive.debian.org wheezy/updates/main i386 Packages
+Hit http://archive.debian.org wheezy/updates/contrib i386 Packages
+Hit http://archive.debian.org wheezy/updates/non-free i386 Packages
+Fetched 3974 B in 1s (3086 B/s)
+Reading package lists... Done
+W: GPG error: http://archive.debian.org wheezy Release: The following signatures were invalid: KEYEXPIRED 1587841717 KEYEXPIRED 1668891673 KEYEXPIRED 1557241909
+W: GPG error: http://archive.debian.org wheezy/updates Release: The following signatures were invalid: KEYEXPIRED 1668892417 KEYEXPIRED 1587841717
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+build-essential is already the newest version.
+dpkg-dev is already the newest version.
+libgcc1 is already the newest version.
+libstdc++6 is already the newest version.
+g++ is already the newest version.
+gcc is already the newest version.
+make is already the newest version.
+libc6-dev is already the newest version.
+0 upgraded, 0 newly installed, 0 to remove and 15 not upgraded.
+root@29bcb37807cf:/poc# which gcc
+/usr/bin/gcc
+root@29bcb37807cf:/poc# which g++
+/usr/bin/g++
+root@29bcb37807cf:/poc# which make
+/usr/bin/make
+root@29bcb37807cf:/poc# apt-get update -o Acquire::Check-Valid-Until=false
+Get:1 http://archive.debian.org wheezy Release.gpg [2373 B]
+Get:2 http://archive.debian.org wheezy/updates Release.gpg [1601 B]
+Hit http://archive.debian.org wheezy Release
+Hit http://archive.debian.org wheezy/updates Release
+Ign http://archive.debian.org wheezy Release
+Ign http://archive.debian.org wheezy/updates Release
+Hit http://archive.debian.org wheezy/main i386 Packages
+Hit http://archive.debian.org wheezy/contrib i386 Packages
+Hit http://archive.debian.org wheezy/non-free i386 Packages
+Hit http://archive.debian.org wheezy/updates/main i386 Packages
+Hit http://archive.debian.org wheezy/updates/contrib i386 Packages
+Hit http://archive.debian.org wheezy/updates/non-free i386 Packages
+Fetched 3974 B in 1s (2983 B/s)
+Reading package lists... Done
+W: GPG error: http://archive.debian.org wheezy Release: The following signatures were invalid: KEYEXPIRED 1587841717 KEYEXPIRED 1668891673 KEYEXPIRED 1557241909
+W: GPG error: http://archive.debian.org wheezy/updates Release: The following signatures were invalid: KEYEXPIRED 1668892417 KEYEXPIRED 1587841717
+root@29bcb37807cf:/poc# apt-get install -y --allow-unauthenticated gcc g++ make libc6-dev dpkg-dev
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+dpkg-dev is already the newest version.
+g++ is already the newest version.
+gcc is already the newest version.
+make is already the newest version.
+libc6-dev is already the newest version.
+0 upgraded, 0 newly installed, 0 to remove and 15 not upgraded.
+root@29bcb37807cf:/poc# apt-get install -y --allow-unauthenticated build-essential
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+build-essential is already the newest version.
+0 upgraded, 0 newly installed, 0 to remove and 15 not upgraded.
+root@29bcb37807cf:/poc# gcc --version
+gcc (Debian 4.7.2-5) 4.7.2
+Copyright (C) 2012 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+root@29bcb37807cf:/poc# g++ --version
+g++ (Debian 4.7.2-5) 4.7.2
+Copyright (C) 2012 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+root@29bcb37807cf:/poc# make --version
+GNU Make 3.81
+Copyright (C) 2006  Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.
+There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+This program built for i486-pc-linux-gnu
+root@29bcb37807cf:/poc# ./poc
+bash: ./poc: No such file or directory
+root@29bcb37807cf:/poc# ls
+Exploit.c  Exploit.cpp  Exploit.out  LICENSE  README.md
+root@29bcb37807cf:/poc# make
+make: *** No targets specified and no makefile found.  Stop.
+root@29bcb37807cf:/poc# make Exploit.c
+make: Nothing to be done for `Exploit.c'.
+root@29bcb37807cf:/poc# gcc Exploit.c -o exploit
+root@29bcb37807cf:/poc# g++ Exploit.cpp -o exploit
+root@29bcb37807cf:/poc# ./exploit
+
+Usage: ./exploit <saved eip> <count> <packet length> <username length> <host> <port> <h(i)>
+
+root@29bcb37807cf:/poc# cat > Makefile <<'EOF'
+> all:
+> \tg++ Exploit.cpp -o exploit
+> EOF
+root@29bcb37807cf:/poc# make
+Makefile:2: *** missing separator.  Stop.
+root@29bcb37807cf:/poc# cat > Makefile <<'EOF'
+> all:
+> g++ Exploit.cpp -o exploit
+> EOF
+root@29bcb37807cf:/poc# make
+Makefile:2: *** missing separator.  Stop.
+root@29bcb37807cf:/poc# g++ Exploit.cpp -o exploit
 root@29bcb37807cf:/poc# ./exploit
 
 Usage: ./exploit <saved eip> <count> <packet length> <username length> <host> <port> <h(i)>
@@ -56,3 +199,4 @@ Enter new UNIX password:
 Retype new UNIX password:
 passwd: password updated successfully
 root@29bcb37807cf:/poc#
+```
