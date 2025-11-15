@@ -19,3 +19,4 @@ Check the return values of the "open" and "write" functions, and handle errors a
 Free the memory allocated for the "buffer" and "ssh" pointers.
 Replace the "system" function with a safer alternative, such as "execvp", to avoid potential security vulnerabilities.
 It is recommended that these changes be made to the program to ensure its stability and security.
+ 
