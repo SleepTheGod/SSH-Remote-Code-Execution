@@ -1,22 +1,37 @@
-| # SSH Remote Code Execution |
-| SSH Zero-Day | Made By ClumsyLulz | Taylor Christian Newsome |
-Summary: 
-The code provided is a C program that receives input parameters and generates a packet to be sent to a server via the SSH protocol. The program creates a buffer to store data to be sent, and then writes it to a file. It then creates a command line string to execute an SSH connection to the specified host and port, using the "system" function.
-Issues:
-There are several issues with the code that have been identified:
-The program contains a buffer overflow vulnerability in the malloc function where only 28 bytes are allocated for the buffer, but 29 bytes are written to it. This can lead to memory corruption or a segmentation fault.
-The return address calculation is incorrect. The program is using the value of the packet length instead of the buffer size to determine the return address, resulting in an incorrect value.
-The format string in the printf statement for the return address is incorrect, resulting in an undefined behavior.
-The program does not check the return value of the "open" and "write" functions, which can lead to data loss or failure to write the buffer to the file.
-The program does not free the memory allocated for the "buffer" and "ssh" pointers, which can lead to memory leaks.
-The program uses the "system" function to execute the SSH command, which can lead to security vulnerabilities, as it allows arbitrary commands to be executed with elevated privileges.
-Recommendations:
-To address the issues outlined above, the following recommendations are proposed:
-Increase the size of the buffer allocation to 29 bytes to avoid buffer overflow issues.
-Correct the return address calculation by using the buffer size instead of the packet length.
-Correct the format string in the printf statement for the return address.
-Check the return values of the "open" and "write" functions, and handle errors appropriately.
-Free the memory allocated for the "buffer" and "ssh" pointers.
-Replace the "system" function with a safer alternative, such as "execvp", to avoid potential security vulnerabilities.
-It is recommended that these changes be made to the program to ensure its stability and security.
- 
+# SSH Remote Code Execution
+
+**SSH Zero-Day** | Made by ClumsyLulz & Taylor Christian Newsome
+
+## Summary
+
+This repository contains a C program that accepts input parameters and generates a packet to be sent to a server over the SSH protocol. The program allocates a buffer to hold the data, writes it to a file, and constructs a command-line string to initiate an SSH connection to a specified host and port using the `system` function.
+
+## Identified Issues
+
+Several security and stability issues exist in the current implementation:
+
+1. **Buffer Overflow**: Only 28 bytes are allocated with `malloc`, but 29 bytes are written, which can cause memory corruption or segmentation faults.
+2. **Incorrect Return Address Calculation**: The return address is computed using the packet length rather than the buffer size, resulting in an invalid value.
+3. **Format String Issue**: The `printf` statement for the return address contains an incorrect format string, leading to undefined behavior.
+4. **Unchecked I/O Operations**: The return values of `open` and `write` are not verified, risking data loss or incomplete writes.
+5. **Memory Leaks**: Allocated memory for `buffer` and `ssh` pointers is never freed.
+6. **Unsafe Command Execution**: Using `system` to execute the SSH command allows arbitrary commands to run with elevated privileges, posing a serious security risk.
+
+## Recommendations
+
+To improve the program's security and reliability, the following changes are recommended:
+
+* Allocate at least 29 bytes for the buffer to prevent overflow.
+* Use the buffer size, not the packet length, when calculating the return address.
+* Correct the format string in the `printf` statement for the return address.
+* Check and handle return values for `open` and `write` calls.
+* Free all dynamically allocated memory for `buffer` and `ssh` pointers.
+* Replace `system` with a safer alternative like `execvp` to avoid executing arbitrary commands.
+
+Implementing these fixes will enhance the program’s stability and reduce potential security vulnerabilities.
+
+---
+
+If you want, I can also make an **even snappier, GitHub-friendly version** with sections like **Vulnerability Summary**, **PoC**, and **Mitigation** so it looks professional for security reports or CTF submissions.
+
+Do you want me to do that?
